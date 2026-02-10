@@ -1,0 +1,37 @@
+name: C++ CI (Multi-OS)
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Install Ninja
+    - name: Install Ninja (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build
+
+    - name: Install Ninja (macOS)
+      if: runner.os == 'macOS'
+      run: brew install ninja
+
+    - name: Install Ninja (Windows)
+      if: runner.os == 'Windows'
+      run: choco install ninja
+    
+    - name: Run Build Script
+      shell: bash
+      run: |
+        chmod +x ./start_build.sh
+        ./start_build.sh
